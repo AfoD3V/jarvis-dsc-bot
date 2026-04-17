@@ -1,0 +1,24 @@
+schema: spec-driven
+
+context: |
+  Project: jarvis-dsc-bot
+  Runtime: Node.js 20+, ESM modules
+  Services: bot-api (Discord interaction intake) and worker (background job execution)
+  Shared stack: Redis queue + Postgres persistence
+  Local environment: Docker Compose
+  Production environment: single-node k3s on VPS
+  Architecture constraints:
+    - Keep command logic decoupled from provider SDKs through adapters
+    - Keep long-running LLM/search work out of interaction handlers
+    - Prefer small incremental changes with runnable docs
+
+rules:
+  proposal:
+    - Include explicit non-goals for each change
+    - List capabilities in kebab-case and align with spec folder names
+  design:
+    - Document alternatives considered for major technical decisions
+    - Include at least one operational risk with mitigation
+  tasks:
+    - Use checkbox task format with numeric grouping (X.Y)
+    - Keep each task scoped to a single verifiable outcome

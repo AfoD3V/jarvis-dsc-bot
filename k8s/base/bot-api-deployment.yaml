@@ -1,0 +1,46 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: bot-api
+  namespace: jarvis
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: bot-api
+  template:
+    metadata:
+      labels:
+        app: bot-api
+    spec:
+      containers:
+        - name: bot-api
+          image: ghcr.io/afod3v/jarvis-dsc-bot:latest
+          imagePullPolicy: Always
+          command: ["npm", "run", "start:bot"]
+          envFrom:
+            - configMapRef:
+                name: jarvis-config
+            - secretRef:
+                name: jarvis-secrets
+          ports:
+            - containerPort: 3001
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: 3001
+            initialDelaySeconds: 10
+            periodSeconds: 5
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: 3001
+            initialDelaySeconds: 20
+            periodSeconds: 10
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "256Mi"
+            limits:
+              cpu: "500m"
+              memory: "512Mi"
