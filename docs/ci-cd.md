@@ -54,6 +54,12 @@ Image tags pushed:
 - `ghcr.io/afod3v/jarvis-dsc-bot:<git-sha>`
 - `ghcr.io/afod3v/jarvis-dsc-bot:latest`
 
+Image platform currently built in CI:
+
+- `linux/amd64`
+
+Note: ARM64 image build is disabled because `npm ci` intermittently fails under QEMU emulation in GitHub Actions.
+
 Deploy step uses immutable SHA tag:
 
 - bot-api -> `:<git-sha>`
