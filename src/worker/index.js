@@ -11,6 +11,7 @@ import { createRedisConnection, closeRedisConnection } from "../shared/queue/con
 import { createGeminiSummaryProvider } from "../shared/providers/llm/geminiSummaryProvider.js";
 import { createFactCheckLlmProvider } from "../shared/providers/llm/factCheckLlmProvider.js";
 import { createTavilySearchProvider } from "../shared/providers/search/tavilySearchProvider.js";
+import { youtubeTranscriptProvider } from "../shared/providers/transcript/youtubeTranscriptProvider.js";
 import { createCommandServices } from "../shared/services/commandServiceFactory.js";
 import { startWorkerRuntime } from "./runtime.js";
 import { createDiscordResultPoster } from "./postDiscordResult.js";
@@ -25,6 +26,7 @@ const searchProvider = createTavilySearchProvider(config.providers.search);
 const factCheckProvider = createFactCheckLlmProvider(config.providers.factCheck);
 const services = createCommandServices({
   summaryProvider,
+  transcriptProvider: youtubeTranscriptProvider,
   searchProvider,
   factCheckProvider,
   logger

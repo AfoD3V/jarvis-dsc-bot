@@ -16,6 +16,11 @@ const logger = {
 
 test("tldr returns fallback when youtube source unavailable", async () => {
   const service = createTldrService({
+    transcriptProvider: {
+      async getTranscript() {
+        throw new Error("source unavailable");
+      }
+    },
     summaryProvider: {
       async summarizeFromYoutube() {
         throw new Error("source unavailable");
@@ -36,6 +41,11 @@ test("tldr returns fallback when youtube source unavailable", async () => {
 
 test("tldr maps captcha errors to informative message", async () => {
   const service = createTldrService({
+    transcriptProvider: {
+      async getTranscript() {
+        throw new Error("[YoutubeTranscript] captcha required");
+      }
+    },
     summaryProvider: {
       async summarizeFromYoutube() {
         throw new Error("[YoutubeTranscript] 🚨 YouTube is receiving too many requests from this IP and now requires solving a captcha to continue");
@@ -60,6 +70,11 @@ test("tldr maps captcha errors to informative message", async () => {
 
 test("tldr returns summary from youtube url via summary provider", async () => {
   const service = createTldrService({
+    transcriptProvider: {
+      async getTranscript() {
+        throw new Error("transcript unavailable");
+      }
+    },
     summaryProvider: {
       async summarizeFromYoutube(input) {
         assert.equal(input.youtubeUrl, "https://youtube.com/watch?v=123");
@@ -78,6 +93,38 @@ test("tldr returns summary from youtube url via summary provider", async () => {
   assert.equal(result.success, true);
   assert.equal(result.code, "OK");
   assert.equal(result.summary, "generated summary");
+});
+
+test("tldr prefers transcript summarization when available", async () => {
+  const service = createTldrService({
+    transcriptProvider: {
+      async getTranscript(inputUrl) {
+        assert.equal(inputUrl, "https://youtube.com/watch?v=123");
+        return "transcript body";
+      }
+    },
+    summaryProvider: {
+      async summarize(input) {
+        assert.equal(input.transcript, "transcript body");
+        assert.equal(input.detailLevel, "high");
+        return { summary: "summary from transcript" };
+      },
+      async summarizeFromYoutube() {
+        throw new Error("should not fallback");
+      }
+    },
+    logger
+  });
+
+  const result = await service.execute({
+    youtubeUrl: "https://youtube.com/watch?v=123",
+    detailLevel: "high",
+    correlationId: "abc"
+  });
+
+  assert.equal(result.success, true);
+  assert.equal(result.code, "OK");
+  assert.equal(result.summary, "summary from transcript");
 });
 
 test("fact-check returns unknown when evidence insufficient", async () => {

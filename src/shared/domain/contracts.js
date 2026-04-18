@@ -1,6 +1,12 @@
 /**
  * @typedef {Object} SummaryProvider
  * @property {(input: { youtubeUrl: string, detailLevel: string, language: string, correlationId: string }) => Promise<{ summary: string }>} summarizeFromYoutube
+ * @property {(input: { transcript: string, detailLevel: string, language: string, correlationId: string }) => Promise<{ summary: string }>} summarize
+ */
+
+/**
+ * @typedef {Object} TranscriptProvider
+ * @property {(youtubeUrl: string) => Promise<string>} getTranscript
  */
 
 /**
