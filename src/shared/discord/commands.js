@@ -7,6 +7,17 @@ export const commandDefinitions = [
     .addStringOption((option) => option.setName("url").setDescription("YouTube URL").setRequired(true))
     .addStringOption((option) =>
       option
+        .setName("detail")
+        .setDescription("Poziom szczegolowosci")
+        .setRequired(true)
+        .addChoices(
+          { name: "niski", value: "low" },
+          { name: "sredni", value: "mid" },
+          { name: "wysoki", value: "high" }
+        )
+    )
+    .addStringOption((option) =>
+      option
         .setName("start")
         .setDescription("Poczatek fragmentu (ss, mm:ss, hh:mm:ss)")
         .setRequired(false)
@@ -16,17 +27,6 @@ export const commandDefinitions = [
         .setName("end")
         .setDescription("Koniec fragmentu (ss, mm:ss, hh:mm:ss)")
         .setRequired(false)
-    )
-    .addStringOption((option) =>
-      option
-        .setName("detail")
-        .setDescription("Poziom szczegolowosci")
-        .setRequired(true)
-        .addChoices(
-          { name: "niski", value: "low" },
-          { name: "sredni", value: "mid" },
-          { name: "wysoki", value: "high" }
-        )
     ),
   new SlashCommandBuilder()
     .setName("fc")
