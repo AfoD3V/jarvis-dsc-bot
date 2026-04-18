@@ -16,10 +16,10 @@ This file is a persistent reference for people and AI agents working in this rep
 ## Current Command Behavior
 
 - `/tldr`
-  - Input: YouTube URL + detail level (`low`, `mid`, `high`)
+  - Input: YouTube URL + detail level (`low`, `mid`, `high`) + optional clip range (`start`, `end`)
   - Output language: Polish (`pl`)
-  - Execution path: transcript retrieval -> transcript summarization
-  - Failure mode: if transcript cannot be retrieved (for example disabled captions), returns fallback message and does not use URL-only summarization
+  - Execution path: Gemini YouTube video input -> transcript fallback -> fallback message
+  - Failure mode: if both video and transcript paths fail (for example disabled captions and video source unavailable), returns fallback message
 - `/fc`
   - Input: natural-language claim
   - Output language: Polish (`pl`)
@@ -72,3 +72,8 @@ Entry format:
   - Learning: Re-running manual migration and command sync after each deployment is error-prone.
   - Impact: Operational drift can break commands even when deployments are healthy.
   - Action taken: CI/CD deploy workflow now runs `db:migrate` and `commands:sync` automatically after `bot-api` rollout.
+
+- Date: 2026-04-18
+  - Learning: Transcript-only strategy improves relevance but fails often for videos with disabled captions.
+  - Impact: `/tldr` needs a primary source path that does not depend only on transcript availability.
+  - Action taken: `/tldr` now uses Gemini video input (`fileData.fileUri`) as primary strategy and transcript summarization as fallback.

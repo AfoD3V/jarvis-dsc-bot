@@ -20,7 +20,9 @@ function jobPayloadFromInteraction(interaction, correlationId) {
       },
       input: {
         youtubeUrl: interaction.options.getString("url", true),
-        detailLevel: interaction.options.getString("detail", true)
+        detailLevel: interaction.options.getString("detail", true),
+        startOffsetRaw: interaction.options.getString("start", false) || undefined,
+        endOffsetRaw: interaction.options.getString("end", false) || undefined
       }
     };
   }

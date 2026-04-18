@@ -1,25 +1,29 @@
 ## ADDED Requirements
 
 ### Requirement: TLDR command input contract
-The system SHALL provide a `/tldr` command that accepts a YouTube URL and summary detail level.
+The system SHALL provide a `/tldr` command that accepts a YouTube URL, summary detail level, and optional clip range (`start` and `end`).
 
 #### Scenario: User submits valid TLDR request
 - **WHEN** a user invokes `/tldr` with a valid YouTube URL and supported detail option
 - **THEN** the system MUST accept the request and execute a summary workflow using those options
 
+#### Scenario: User submits valid TLDR clip request
+- **WHEN** a user invokes `/tldr` with a valid YouTube URL, detail option, and valid `start`/`end` offsets
+- **THEN** the system MUST execute the summary workflow for the selected video segment
+
 ### Requirement: TLDR summary behavior
-The system SHALL generate a structured summary from video transcript content and scale depth according to selected detail level.
+The system SHALL generate a structured summary from Gemini video input and scale depth according to selected detail level.
 
 #### Scenario: Detail level controls output depth
 - **WHEN** a summary is generated for the same video using low and high detail levels
 - **THEN** the high-detail response MUST contain materially more granular points than the low-detail response
 
-### Requirement: TLDR transcript fallback handling
-The system SHALL return an explicit fallback response when transcript extraction is unavailable or insufficient.
+### Requirement: TLDR source fallback handling
+The system SHALL use transcript summarization as fallback when Gemini video input is unavailable, and return an explicit fallback response when both sources are unavailable.
 
-#### Scenario: Transcript cannot be retrieved
-- **WHEN** transcript retrieval fails or returns unusable content
-- **THEN** the system MUST return a user-facing message that summary generation could not be completed due to transcript availability
+#### Scenario: Video source fails and transcript cannot be retrieved
+- **WHEN** Gemini video input fails and transcript retrieval fails or returns unusable content
+- **THEN** the system MUST return a user-facing message that summary generation could not be completed due to source availability
 
 ### Requirement: Fact-check command input contract
 The system SHALL provide an `/fc` command that accepts a natural-language claim.

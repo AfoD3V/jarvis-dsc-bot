@@ -1,5 +1,6 @@
 import { ChatGoogleGenerativeAI } from "@langchain/google-genai";
 import { HumanMessage, SystemMessage } from "@langchain/core/messages";
+import { GoogleGenAI } from "@google/genai";
 
 const SOURCE_UNAVAILABLE_MARKER = "JARVIS_SOURCE_UNAVAILABLE";
 
@@ -26,23 +27,43 @@ export function createGeminiSummaryProvider({ apiKey, model }) {
     model,
     temperature: 0.2,
   });
+  const client = new GoogleGenAI({ apiKey });
 
   return {
-    async summarizeFromYoutube({ youtubeUrl, detailLevel, language }) {
-      const systemPrompt = [
+    async summarizeFromYoutube({ youtubeUrl, detailLevel, language, startOffset, endOffset }) {
+      const prompt = [
         "You are a precise assistant that summarizes YouTube videos.",
         detailInstructions[detailLevel] || detailInstructions.mid,
         `Return response in language: ${language}.`,
         "Include: short title, bullet points, and one concluding paragraph.",
-        `If you cannot access enough video content from the URL, respond with exactly: ${SOURCE_UNAVAILABLE_MARKER}`,
+        `If you cannot access enough video content from the URL, respond with exactly: ${SOURCE_UNAVAILABLE_MARKER}`
       ].join(" ");
 
-      const result = await llm.invoke([
-        new SystemMessage(systemPrompt),
-        new HumanMessage(`YouTube URL: ${youtubeUrl}`),
-      ]);
+      const videoPart = {
+        fileData: {
+          fileUri: youtubeUrl,
+          mimeType: "video/*"
+        }
+      };
 
-      const summary = parseModelContent(result.content);
+      if (startOffset && endOffset) {
+        videoPart.videoMetadata = {
+          startOffset,
+          endOffset
+        };
+      }
+
+      const response = await client.models.generateContent({
+        model,
+        contents: [
+          {
+            role: "user",
+            parts: [videoPart, { text: prompt }]
+          }
+        ]
+      });
+
+      const summary = (response.text || "").trim();
       if (!summary || summary.includes(SOURCE_UNAVAILABLE_MARKER)) {
         throw new Error("YOUTUBE_SOURCE_UNAVAILABLE");
       }

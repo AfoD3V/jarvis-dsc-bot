@@ -16,8 +16,10 @@ This split prevents Discord interaction timeout issues during LLM/search work.
 
 ## TLDR Notes
 
-- Current `/tldr` behavior is transcript-based for reliability.
-- If transcript is unavailable/disabled for a video, command returns a fallback message instead of hallucinating unrelated content.
+- `/tldr` uses Gemini video input for YouTube URL understanding as primary strategy.
+- Optional `/tldr` params: `start` and `end` for clip-only summaries (`ss`, `mm:ss`, `hh:mm:ss`).
+- If Gemini video path fails, service falls back to transcript-based summarization.
+- If both video and transcript sources fail, command returns a fallback message.
 
 ## Deployment Notes
 

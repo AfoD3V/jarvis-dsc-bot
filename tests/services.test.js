@@ -18,15 +18,15 @@ test("tldr returns fallback when youtube source unavailable", async () => {
   const service = createTldrService({
     transcriptProvider: {
       async getTranscript() {
-        throw new Error("source unavailable");
+        return "transcript body";
       }
     },
     summaryProvider: {
-      async summarize() {
+      async summarizeFromYoutube() {
         throw new Error("source unavailable");
       },
-      async summarizeFromYoutube() {
-        return { summary: "unused" };
+      async summarize() {
+        return { summary: "from transcript fallback" };
       }
     },
     logger
@@ -38,8 +38,9 @@ test("tldr returns fallback when youtube source unavailable", async () => {
     correlationId: "abc"
   });
 
-  assert.equal(result.success, false);
-  assert.equal(result.code, "SOURCE_UNAVAILABLE");
+  assert.equal(result.success, true);
+  assert.equal(result.code, "OK");
+  assert.equal(result.summary, "from transcript fallback");
 });
 
 test("tldr maps captcha errors to informative message", async () => {
@@ -50,11 +51,11 @@ test("tldr maps captcha errors to informative message", async () => {
       }
     },
     summaryProvider: {
+      async summarizeFromYoutube() {
+        throw new Error("source unavailable");
+      },
       async summarize() {
         throw new Error("[YoutubeTranscript] 🚨 YouTube is receiving too many requests from this IP and now requires solving a captcha to continue");
-      },
-      async summarizeFromYoutube() {
-        return { summary: "unused" };
       }
     },
     logger
@@ -82,10 +83,10 @@ test("tldr returns fallback when transcript unavailable", async () => {
       }
     },
     summaryProvider: {
-      async summarize() {
-        return { summary: "unused" };
-      },
       async summarizeFromYoutube() {
+        throw new Error("source unavailable");
+      },
+      async summarize() {
         return { summary: "unused" };
       }
     },
@@ -103,6 +104,7 @@ test("tldr returns fallback when transcript unavailable", async () => {
 });
 
 test("tldr prefers transcript summarization when available", async () => {
+  let summarizeFromYoutubeCalled = false;
   const service = createTldrService({
     transcriptProvider: {
       async getTranscript(inputUrl) {
@@ -111,13 +113,14 @@ test("tldr prefers transcript summarization when available", async () => {
       }
     },
     summaryProvider: {
+      async summarizeFromYoutube() {
+        summarizeFromYoutubeCalled = true;
+        throw new Error("source unavailable");
+      },
       async summarize(input) {
         assert.equal(input.transcript, "transcript body");
         assert.equal(input.detailLevel, "high");
         return { summary: "summary from transcript" };
-      },
-      async summarizeFromYoutube() {
-        return { summary: "unused" };
       }
     },
     logger
@@ -132,6 +135,74 @@ test("tldr prefers transcript summarization when available", async () => {
   assert.equal(result.success, true);
   assert.equal(result.code, "OK");
   assert.equal(result.summary, "summary from transcript");
+  assert.equal(summarizeFromYoutubeCalled, true);
+});
+
+test("tldr returns summary from video provider when available", async () => {
+  let transcriptCalled = false;
+  const service = createTldrService({
+    transcriptProvider: {
+      async getTranscript() {
+        transcriptCalled = true;
+        return "transcript body";
+      }
+    },
+    summaryProvider: {
+      async summarizeFromYoutube(input) {
+        assert.equal(input.youtubeUrl, "https://youtube.com/watch?v=abc");
+        assert.equal(input.startOffset, "40s");
+        assert.equal(input.endOffset, "80s");
+        return { summary: "video summary" };
+      },
+      async summarize() {
+        return { summary: "unused" };
+      }
+    },
+    logger
+  });
+
+  const result = await service.execute({
+    youtubeUrl: "https://youtube.com/watch?v=abc",
+    detailLevel: "high",
+    startOffsetRaw: "00:40",
+    endOffsetRaw: "01:20",
+    correlationId: "abc"
+  });
+
+  assert.equal(result.success, true);
+  assert.equal(result.code, "OK");
+  assert.equal(result.summary, "video summary");
+  assert.equal(transcriptCalled, false);
+});
+
+test("tldr validates start and end range", async () => {
+  const service = createTldrService({
+    transcriptProvider: {
+      async getTranscript() {
+        return "transcript body";
+      }
+    },
+    summaryProvider: {
+      async summarizeFromYoutube() {
+        return { summary: "unused" };
+      },
+      async summarize() {
+        return { summary: "unused" };
+      }
+    },
+    logger
+  });
+
+  const result = await service.execute({
+    youtubeUrl: "https://youtube.com/watch?v=abc",
+    detailLevel: "mid",
+    startOffsetRaw: "80",
+    endOffsetRaw: "40",
+    correlationId: "abc"
+  });
+
+  assert.equal(result.success, false);
+  assert.equal(result.code, "INVALID_CLIP_RANGE");
 });
 
 test("fact-check returns unknown when evidence insufficient", async () => {

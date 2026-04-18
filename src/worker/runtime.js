@@ -7,6 +7,8 @@ async function executeCommand({ payload, services, logger, searchMaxResults }) {
     const result = await services.tldr.execute({
       youtubeUrl: payload.input.youtubeUrl,
       detailLevel: payload.input.detailLevel,
+      startOffsetRaw: payload.input.startOffsetRaw,
+      endOffsetRaw: payload.input.endOffsetRaw,
       correlationId: payload.correlationId
     });
 
