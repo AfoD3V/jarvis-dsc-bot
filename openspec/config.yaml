@@ -7,6 +7,12 @@ context: |
   Shared stack: Redis queue + Postgres persistence
   Local environment: Docker Compose
   Production environment: single-node k3s on VPS
+  Current command behavior:
+    - /tldr: transcript-grounded summarization in Polish, detail-level control (low/mid/high), explicit fallback on transcript unavailability
+    - /fc: claim fact-check in Polish with verdict, explanation, and source list
+  CI/CD behavior:
+    - main deploy updates bot-api and worker images
+    - after bot-api rollout, CI runs db:migrate and commands:sync automatically
   Architecture constraints:
     - Keep command logic decoupled from provider SDKs through adapters
     - Keep long-running LLM/search work out of interaction handlers

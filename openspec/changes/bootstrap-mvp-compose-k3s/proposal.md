@@ -5,7 +5,7 @@ The repository currently contains only a prototype vision and no runnable bot, l
 ## What Changes
 
 - Bootstrap the Discord bot MVP with a modular runtime split into an interaction-facing service and background worker service.
-- Deliver two initial slash-command capabilities: `/tldr` (YouTube summary with detail level and language options) and `/fc` (fact-check verdict with evidence and citations).
+- Deliver two initial slash-command capabilities: `/tldr` (YouTube summary with detail level) and `/fc` (fact-check verdict with evidence and citations).
 - Define provider abstractions for LLM and web-search integrations so future model/vendor changes and MCP/n8n extensions do not require command rewrites.
 - Add a clear Docker Compose development workflow with Postgres and Redis dependencies, including first-run and troubleshooting guidance.
 - Add a clear k3s deployment workflow for a VPS, including in-cluster Postgres/Redis, Kubernetes resource layout, and GitHub Actions-based deployment flow.

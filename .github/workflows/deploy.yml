@@ -75,10 +75,20 @@ jobs:
       - name: Deploy image to k3s
         run: |
           kubectl -n jarvis set image deployment/bot-api bot-api=${{ env.IMAGE_NAME }}:${{ github.sha }}
-          kubectl -n jarvis set image deployment/worker worker=${{ env.IMAGE_NAME }}:${{ github.sha }}
-      - name: Verify rollout
+      - name: Verify bot-api rollout
         run: |
           kubectl -n jarvis rollout status deployment/bot-api
+      - name: Run database migrations
+        run: |
+          kubectl -n jarvis exec deploy/bot-api -- npm run db:migrate
+      - name: Sync Discord slash commands
+        run: |
+          kubectl -n jarvis exec deploy/bot-api -- npm run commands:sync
+      - name: Deploy worker image to k3s
+        run: |
+          kubectl -n jarvis set image deployment/worker worker=${{ env.IMAGE_NAME }}:${{ github.sha }}
+      - name: Verify worker rollout
+        run: |
           kubectl -n jarvis rollout status deployment/worker
       - name: Rollback on failed rollout
         if: failure()

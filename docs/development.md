@@ -36,6 +36,8 @@ docker compose exec bot npm run db:migrate
 docker compose exec bot npm run commands:sync
 ```
 
+Note: these are local-only setup steps. In production, CI/CD runs migration and command sync automatically during deploy.
+
 ## 4) Validate service health
 
 ```bash

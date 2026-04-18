@@ -8,7 +8,7 @@
 ## 2. Command domain and provider adapters
 
 - [x] 2.1 Define command service interfaces and provider adapter contracts for summarization and fact-check workflows
-- [x] 2.2 Implement `/tldr` workflow in domain service including detail-level and language parameter handling
+- [x] 2.2 Implement `/tldr` workflow in domain service including detail-level handling and Polish response behavior
 - [x] 2.3 Implement `/fc` workflow in domain service including verdict classification, evidence normalization, and uncertainty path
 - [x] 2.4 Implement transcript unavailability fallback and insufficient-evidence fallback responses per requirements
 

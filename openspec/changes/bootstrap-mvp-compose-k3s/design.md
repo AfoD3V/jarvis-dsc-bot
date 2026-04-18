@@ -38,7 +38,7 @@ The project currently has a product vision but no runnable implementation. The M
    - **Why not chosen:** creates coupling that makes future MCP/n8n and provider substitution expensive.
 
 4. **Model `/tldr` and `/fc` as asynchronous command workflows with explicit fallback behavior.**
-   - `/tldr` must support language and detail controls and handle transcript unavailability.
+   - `/tldr` must support detail controls, use Polish output, and handle transcript unavailability.
    - `/fc` must produce verdict categories with citation-backed evidence and uncertainty path.
    - **Alternative considered:** synchronous responses only.
    - **Why not chosen:** unreliable under external API latency and Discord timing constraints.

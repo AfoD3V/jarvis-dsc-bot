@@ -15,7 +15,7 @@ data:
   POSTGRES_SSL: "false"
   REDIS_HOST: "redis"
   REDIS_PORT: "6379"
-  GEMINI_MODEL: "gemini-1.5-flash"
+  GEMINI_MODEL: "models/gemini-2.5-flash"
   FACTCHECK_API_ENDPOINT: "https://api.anthropic.com/v1/messages"
   FACTCHECK_MODEL: "claude-sonnet-4-20250514"
   SEARCH_API_ENDPOINT: "https://api.tavily.com/search"

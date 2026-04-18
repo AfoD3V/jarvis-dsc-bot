@@ -13,6 +13,18 @@ This file is a persistent reference for people and AI agents working in this rep
 - Local stack: `docker-compose.yml`
 - Kubernetes manifests: `k8s/base`
 
+## Current Command Behavior
+
+- `/tldr`
+  - Input: YouTube URL + detail level (`low`, `mid`, `high`)
+  - Output language: Polish (`pl`)
+  - Execution path: transcript retrieval -> transcript summarization
+  - Failure mode: if transcript cannot be retrieved (for example disabled captions), returns fallback message and does not use URL-only summarization
+- `/fc`
+  - Input: natural-language claim
+  - Output language: Polish (`pl`)
+  - Returns verdict + explanation + source list
+
 ## Operational Commands
 
 - Install deps: `npm install`
@@ -50,3 +62,13 @@ Entry format:
   - Learning: Running long LLM/search work inside interaction handlers risks Discord timeout and poor responsiveness.
   - Impact: Queue-backed worker separation is required from day one.
   - Action taken: Runtime was split into `bot-api` and `worker` with Redis queue handoff.
+
+- Date: 2026-04-18
+  - Learning: URL-only YouTube summarization can produce non-deterministic and irrelevant outputs for the same link.
+  - Impact: `/tldr` reliability requires source-grounded input instead of plain URL prompting.
+  - Action taken: `/tldr` was switched to transcript-first behavior with explicit fallback on transcript unavailability.
+
+- Date: 2026-04-18
+  - Learning: Re-running manual migration and command sync after each deployment is error-prone.
+  - Impact: Operational drift can break commands even when deployments are healthy.
+  - Action taken: CI/CD deploy workflow now runs `db:migrate` and `commands:sync` automatically after `bot-api` rollout.

@@ -1,10 +1,10 @@
 ## ADDED Requirements
 
 ### Requirement: TLDR command input contract
-The system SHALL provide a `/tldr` command that accepts a YouTube URL, summary detail level, and output language selection.
+The system SHALL provide a `/tldr` command that accepts a YouTube URL and summary detail level.
 
 #### Scenario: User submits valid TLDR request
-- **WHEN** a user invokes `/tldr` with a valid YouTube URL and supported detail/language options
+- **WHEN** a user invokes `/tldr` with a valid YouTube URL and supported detail option
 - **THEN** the system MUST accept the request and execute a summary workflow using those options
 
 ### Requirement: TLDR summary behavior
@@ -22,10 +22,10 @@ The system SHALL return an explicit fallback response when transcript extraction
 - **THEN** the system MUST return a user-facing message that summary generation could not be completed due to transcript availability
 
 ### Requirement: Fact-check command input contract
-The system SHALL provide an `/fc` command that accepts a natural-language claim and output language selection.
+The system SHALL provide an `/fc` command that accepts a natural-language claim.
 
 #### Scenario: User submits valid fact-check request
-- **WHEN** a user invokes `/fc` with a non-empty claim and supported language option
+- **WHEN** a user invokes `/fc` with a non-empty claim
 - **THEN** the system MUST execute a fact-check workflow for that claim
 
 ### Requirement: Fact-check verdict and evidence output
@@ -42,9 +42,9 @@ The system SHALL return an explicit uncertainty outcome when source evidence is 
 - **WHEN** the fact-check workflow cannot obtain adequate supporting evidence
 - **THEN** the system MUST return an uncertainty verdict and indicate that evidence was insufficient
 
-### Requirement: Language-aware responses
-The system SHALL return `/tldr` and `/fc` responses in the user-selected language when that language is supported.
+### Requirement: Fixed Polish response language
+The system SHALL return `/tldr` and `/fc` responses in Polish.
 
-#### Scenario: User requests Polish output
-- **WHEN** a user executes `/tldr` or `/fc` with language set to Polish
+#### Scenario: Command response is generated
+- **WHEN** a user executes `/tldr` or `/fc`
 - **THEN** the returned response content MUST be generated in Polish

@@ -63,10 +63,14 @@ kubectl -n jarvis logs deploy/worker -f
 
 ## 5) Run migrations and command sync
 
+For first-time manual deployment (without CI), run:
+
 ```bash
 kubectl -n jarvis exec deploy/bot-api -- npm run db:migrate
 kubectl -n jarvis exec deploy/bot-api -- npm run commands:sync
 ```
+
+If you deploy via GitHub Actions (`main` branch), these commands run automatically as part of the deploy workflow.
 
 ## Rollback
 

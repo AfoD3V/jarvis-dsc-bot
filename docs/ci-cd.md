@@ -20,6 +20,12 @@ So deployment goes to whichever cluster is described in `KUBE_CONFIG`.
 Configure in GitHub repository settings -> Secrets and variables -> Actions:
 
 - `KUBE_CONFIG` - base64-encoded kubeconfig with access to your k3s cluster
+- `GHCR_PAT` - token used to push images to GHCR
+
+Required cluster permissions for the identity in `KUBE_CONFIG`:
+
+- `deployments` update/patch/get (for `set image` and rollout checks)
+- `pods/exec` create (for `db:migrate` and `commands:sync` hooks)
 
 ## Create `KUBE_CONFIG`
 
@@ -40,8 +46,8 @@ base64 /etc/rancher/k3s/k3s.yaml | tr -d '\n'
 ## Workflow behavior
 
 - `pull_request` to `main`: runs tests only.
-- `push` to `main`: runs tests, builds/pushes GHCR image, deploys to k3s.
-- `workflow_dispatch`: manual run of the same build/deploy flow.
+- `push` to `main`: runs tests, builds/pushes GHCR image, deploys to k3s, runs DB migrations, syncs Discord slash commands.
+- `workflow_dispatch`: manual run of the same build/deploy/migrate/sync flow.
 
 Image tags pushed:
 
@@ -52,6 +58,15 @@ Deploy step uses immutable SHA tag:
 
 - bot-api -> `:<git-sha>`
 - worker -> `:<git-sha>`
+
+Deployment sequence:
+
+1. Update `bot-api` image and wait for rollout.
+2. Run `npm run db:migrate` inside `bot-api`.
+3. Run `npm run commands:sync` inside `bot-api`.
+4. Update `worker` image and wait for rollout.
+
+If migration or command sync fails, the deploy job fails.
 
 ## Optional debug commands in workflow logs
 

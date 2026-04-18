@@ -26,7 +26,7 @@ const envSchema = z.object({
   REDIS_PASSWORD: z.string().optional(),
 
   GEMINI_API_KEY: z.string().min(1, "GEMINI_API_KEY is required"),
-  GEMINI_MODEL: z.string().default("gemini-1.5-flash"),
+  GEMINI_MODEL: z.string().default("models/gemini-2.5-flash"),
 
   FACTCHECK_API_ENDPOINT: z.string().url().default("https://api.anthropic.com/v1/messages"),
   FACTCHECK_API_KEY: z.string().min(1, "FACTCHECK_API_KEY is required"),
