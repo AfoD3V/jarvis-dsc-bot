@@ -22,8 +22,11 @@ test("tldr returns fallback when youtube source unavailable", async () => {
       }
     },
     summaryProvider: {
-      async summarizeFromYoutube() {
+      async summarize() {
         throw new Error("source unavailable");
+      },
+      async summarizeFromYoutube() {
+        return { summary: "unused" };
       }
     },
     logger
@@ -47,8 +50,11 @@ test("tldr maps captcha errors to informative message", async () => {
       }
     },
     summaryProvider: {
-      async summarizeFromYoutube() {
+      async summarize() {
         throw new Error("[YoutubeTranscript] 🚨 YouTube is receiving too many requests from this IP and now requires solving a captcha to continue");
+      },
+      async summarizeFromYoutube() {
+        return { summary: "unused" };
       }
     },
     logger
@@ -68,7 +74,7 @@ test("tldr maps captcha errors to informative message", async () => {
   );
 });
 
-test("tldr returns summary from youtube url via summary provider", async () => {
+test("tldr returns fallback when transcript unavailable", async () => {
   const service = createTldrService({
     transcriptProvider: {
       async getTranscript() {
@@ -76,9 +82,11 @@ test("tldr returns summary from youtube url via summary provider", async () => {
       }
     },
     summaryProvider: {
-      async summarizeFromYoutube(input) {
-        assert.equal(input.youtubeUrl, "https://youtube.com/watch?v=123");
-        return { summary: "generated summary" };
+      async summarize() {
+        return { summary: "unused" };
+      },
+      async summarizeFromYoutube() {
+        return { summary: "unused" };
       }
     },
     logger
@@ -90,9 +98,8 @@ test("tldr returns summary from youtube url via summary provider", async () => {
     correlationId: "abc"
   });
 
-  assert.equal(result.success, true);
-  assert.equal(result.code, "OK");
-  assert.equal(result.summary, "generated summary");
+  assert.equal(result.success, false);
+  assert.equal(result.code, "SOURCE_UNAVAILABLE");
 });
 
 test("tldr prefers transcript summarization when available", async () => {
@@ -110,7 +117,7 @@ test("tldr prefers transcript summarization when available", async () => {
         return { summary: "summary from transcript" };
       },
       async summarizeFromYoutube() {
-        throw new Error("should not fallback");
+        return { summary: "unused" };
       }
     },
     logger

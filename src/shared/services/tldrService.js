@@ -31,36 +31,13 @@ export function createTldrService({ summaryProvider, transcriptProvider, logger 
           language: safeLanguage,
           summary: result.summary
         };
-      } catch (transcriptError) {
-        logger.warn(
-          { correlationId, error: transcriptError.message },
-          "tldr transcript unavailable, falling back to url summary"
-        );
-
-        try {
-          const result = await summaryProvider.summarizeFromYoutube({
-            youtubeUrl,
-            detailLevel: safeDetail,
-            language: safeLanguage,
-            correlationId
-          });
-
-          logger.info({ correlationId }, "tldr completed");
-          return {
-            success: true,
-            code: "OK",
-            detailLevel: safeDetail,
-            language: safeLanguage,
-            summary: result.summary
-          };
-        } catch (error) {
-          logger.warn({ correlationId, error: error.message }, "youtube source unavailable");
-          return {
-            success: false,
-            code: "SOURCE_UNAVAILABLE",
-            message: sourceFallbackMessage()
-          };
-        }
+      } catch (error) {
+        logger.warn({ correlationId, error: error.message }, "tldr failed to summarize transcript");
+        return {
+          success: false,
+          code: "SOURCE_UNAVAILABLE",
+          message: sourceFallbackMessage()
+        };
       }
     }
   };
